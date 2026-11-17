@@ -1,0 +1,41 @@
+# Configuração do monitor de preços de iPhone.
+# Edite este arquivo direto no GitHub para mudar filtros e alertas.
+
+[filtro]
+geracao_minima = 15          # iPhone 15 em diante (inclui Air, Duo, "e")
+armazenamento = "512GB"      # obrigatório
+preco_minimo = 1500          # descarta acessórios/anúncios falsos abaixo disso
+# Condições aceitas: novo, vitrine, recondicionado, usado
+condicoes = ["novo", "vitrine", "recondicionado", "usado"]
+
+[busca]
+termos = ["iphone 512gb", "iphone 512 gb"]
+
+[alertas]
+# Alerta quando o preço do dia ficar X% abaixo da mediana de 30 dias do mesmo modelo/condição
+pct_abaixo_mediana_30d = 8
+# Alerta quando for o menor preço já registrado, pelo menos 1% abaixo do recorde anterior
+# (exige pelo menos N dias de histórico)
+dias_minimos_para_recorde = 3
+
+# Preço-alvo opcional por modelo (preço à vista/PIX, condição "novo").
+# Chave = nome normalizado do modelo, ex.: "iPhone 17 Pro Max".
+[alertas.preco_alvo]
+# "iPhone 17 Pro" = 8500
+# "iPhone 16 Pro Max" = 7500
+
+[dashboard]
+# URL pública do GitHub Pages (preenchida automaticamente pelo workflow se vazia)
+url = ""
+
+[lojas]
+kabum = true
+americanas = true
+carrefour = true
+apple = true
+# Bloqueiam acesso a partir de servidores (testado em 17/11/2026). Ficam ativas:
+# se o GitHub Actions conseguir acessar, os dados entram; se não, aparecem como "bloqueada" no relatório.
+magalu = true
+casasbahia = true
+mercadolivre = true
+amazon = true

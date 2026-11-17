@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitor iPhone 512GB</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f7f7f8;--card:#fff;--fg:#1d1d1f;--muted:#6e6e73;--line:#e3e3e6;--accent:#0066cc;--good:#0a7d32;--bad:#b3261e}
+@media (prefers-color-scheme: dark){:root{--bg:#111113;--card:#1c1c1f;--fg:#f2f2f4;--muted:#a0a0a8;--line:#2e2e33;--accent:#4da3ff;--good:#3fcf6e;--bad:#ff6b5e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{padding:20px 16px 8px;max-width:1200px;margin:auto}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted)}
+main{max-width:1200px;margin:auto;padding:0 16px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.kpi .m{font-weight:600}.kpi .p{font-size:20px;font-weight:700;margin:2px 0}
+.kpi small{color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+select,input{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{cursor:pointer;color:var(--muted);font-weight:600;white-space:nowrap;user-select:none}
+td.n{white-space:nowrap;text-align:right}
+a{color:var(--accent);text-decoration:none}
+.tag{display:inline-block;border:1px solid var(--muted);color:var(--muted);border-radius:9px;padding:0 6px;margin:1px;font-size:11px;white-space:nowrap}
+.t-novo{border-color:var(--good);color:var(--good)}.t-vitrine{border-color:#c77d00;color:#c77d00}
+.t-recondicionado{border-color:#7b5cf0;color:#7b5cf0}.t-usado{border-color:#b85a2b;color:#b85a2b}
+.t-importado{border-color:var(--bad);color:var(--bad)}.t-loja{border-color:var(--accent);color:var(--accent)}
+.good{color:var(--good)}.bad{color:var(--bad)}
+.alert{border-left:4px solid #e8a400}
+.chartwrap{position:relative;height:340px}
+.status span{margin-right:12px;white-space:nowrap}
+</style>
+</head>
+<body>
+<header>
+  <h1>Monitor iPhone 512GB</h1>
+  <div class="sub" id="meta">Carregando…</div>
+</header>
+<main>
+  <div id="alerts"></div>
+
+  <div class="card">
+    <div class="filters">
+      <label>Condição <select id="fCond"><option value="">Todas</option><option>novo</option><option>vitrine</option><option>recondicionado</option><option>usado</option></select></label>
+      <label>Modelo <select id="fModel"><option value="">Todos</option></select></label>
+      <label>Loja <select id="fStore"><option value="">Todas</option></select></label>
+      <label><input type="checkbox" id="fNoImport"> Ocultar importados</label>
+      <label><input type="checkbox" id="fOfficial"> Só loja oficial</label>
+    </div>
+  </div>
+
+  <div class="card"><h3 style="margin:0 0 8px">Menor preço por modelo (hoje)</h3><div class="grid" id="kpis"></div></div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">Histórico do menor preço diário</h3>
+    <div class="filters" style="margin-bottom:8px"><label>Série <select id="fSeries"></select></label>
+    <label><input type="checkbox" id="byStore"> Separar por loja</label></div>
+    <div class="chartwrap"><canvas id="chart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">Todas as ofertas de hoje <small class="sub" id="count"></small></h3>
+    <div class="tbl"><table id="tbl"><thead><tr>
+      <th data-k="model">Modelo</th><th data-k="color">Cor</th><th data-k="price">À vista</th>
+      <th data-k="installment_total">Parcelado</th><th data-k="list_price">Preço "de"</th>
+      <th data-k="store">Loja / vendedor</th><th>Tags</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <div class="card status" id="status"></div>
+  <p class="sub">Preço à vista = menor preço PIX/boleto anunciado; frete e cupons de checkout não incluídos. Dados atualizados diariamente via GitHub Actions.</p>
+</main>
+<script>
+const brl = v => v == null ? "—" : v.toLocaleString("pt-BR", {style: "currency", currency: "BRL"});
+const pct = v => v == null ? "—" : `<span class="${v < 0 ? "good" : v > 0 ? "bad" : ""}">${v > 0 ? "+" : ""}${v.toFixed(1)}%</span>`;
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const tagHtml = t => (t || "").split(",").filter(Boolean).map(x => {
+  const cls = ["novo","vitrine","recondicionado","usado","importado"].includes(x) ? "t-" + x : x === "loja oficial" ? "t-loja" : "";
+  return `<span class="tag ${cls}">${esc(x)}</span>`; }).join("");
+let L, H, chart, sortK = "price", sortDir = 1;
+
+function genOf(m){const g = m.match(/\d+/); return g ? +g[0] : (m.includes("Air") ? 17 : 18);}
+function modelSort(a, b){return genOf(b) - genOf(a) || a.localeCompare(b);}
+function filtered(){
+  const c = fCond.value, m = fModel.value, s = fStore.value;
+  return L.offers.filter(o => (!c || o.condition === c) && (!m || o.model === m) && (!s || o.store === s)
+    && !(fNoImport.checked && (o.tags||"").includes("importado")) && !(fOfficial.checked && o.marketplace));
+}
+function renderKpis(){
+  const best = {};
+  for (const o of filtered()) { const k = o.model + "|" + o.condition; if (!best[k] || o.price < best[k].price) best[k] = o; }
+  const items = Object.fromEntries(L.items.map(i => [i.key, i]));
+  kpis.innerHTML = Object.keys(best).sort((a, b) => modelSort(a.split("|")[0], b.split("|")[0]) || a.localeCompare(b)).map(k => {
+    const o = best[k], i = items[k] || {};
+    return `<div class="card kpi" style="margin:0"><div class="m">${esc(o.model)} <span class="tag t-${o.condition}">${o.condition}</span></div>
+      <div class="p">${brl(o.price)}</div>
+      <small>vs mediana 30d ${pct(i.pct_vs_median30)} · vs Apple ${pct(i.pct_vs_apple)}<br>
+      mín. 30d ${brl(i.min30)} · mín. histórico ${brl(i.min_all)}<br>
+      <a href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.store)}</a> · ${esc(o.seller)}</small></div>`;
+  }).join("") || "<p class='sub'>Nenhuma oferta com esses filtros.</p>";
+}
+function renderTable(){
+  const rows = filtered().slice().sort((a, b) => {
+    const x = a[sortK], y = b[sortK];
+    return (x == null) - (y == null) || (typeof x === "number" ? (x - y) : String(x).localeCompare(String(y))) * sortDir;
+  });
+  count.textContent = `(${rows.length})`;
+  document.querySelector("#tbl tbody").innerHTML = rows.map(o => `<tr>
+    <td><b>${esc(o.model)}</b><br><small class="sub">${esc(o.title)}</small></td><td>${esc(o.color)}</td>
+    <td class="n"><b>${brl(o.price)}</b></td>
+    <td class="n">${o.installment_total ? `${o.installments || ""}x<br>${brl(o.installment_total)}` : "—"}</td>
+    <td class="n">${brl(o.list_price)}</td>
+    <td><a href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.store)}</a><br><small class="sub">${esc(o.seller)}</small></td>
+    <td>${tagHtml(o.tags)}${o.promo ? `<br><small class="sub">${esc(o.promo.slice(0, 120))}</small>` : ""}</td></tr>`).join("");
+}
+function renderChart(){
+  const key = fSeries.value; if (!key) return;
+  const css = getComputedStyle(document.documentElement);
+  const palette = ["#0066cc","#e8590c","#2f9e44","#9c36b5","#c2255c","#1098ad","#5c940d","#e67700"];
+  let ds;
+  if (byStore.checked) {
+    const st = H.stores[key] || {};
+    ds = Object.keys(st).map((s, i) => ({label: s, data: st[s].map(([d, p]) => ({x: d, y: p})), borderColor: palette[i % 8], backgroundColor: palette[i % 8], tension: .2}));
+  } else {
+    ds = [{label: key.replace("|", " · "), data: (H.series[key] || []).map(([d, p]) => ({x: d, y: p})), borderColor: palette[0], backgroundColor: palette[0], tension: .2}];
+  }
+  const labels = [...new Set(ds.flatMap(d => d.data.map(p => p.x)))].sort();
+  chart && chart.destroy();
+  chart = new Chart(document.getElementById("chart"), {type: "line", data: {labels, datasets: ds},
+    options: {maintainAspectRatio: false, parsing: {xAxisKey: "x", yAxisKey: "y"}, interaction: {mode: "index", intersect: false},
+      plugins: {legend: {labels: {color: css.getPropertyValue("--fg")}}, tooltip: {callbacks: {label: c => `${c.dataset.label}: ${brl(c.parsed.y)}`}}},
+      scales: {x: {ticks: {color: css.getPropertyValue("--muted")}, grid: {color: css.getPropertyValue("--line")}},
+               y: {ticks: {color: css.getPropertyValue("--muted"), callback: v => brl(v)}, grid: {color: css.getPropertyValue("--line")}}}}});
+}
+function renderAll(){renderKpis(); renderTable();}
+
+Promise.all([fetch("data/latest.json").then(r => r.json()), fetch("data/history.json").then(r => r.json())]).then(([l, h]) => {
+  L = l; H = h;
+  meta.textContent = `Atualizado em ${l.date} · histórico desde ${l.history_start} (${l.n_days} dia(s)) · ${l.offers.length} ofertas hoje`;
+  const models = [...new Set(l.offers.map(o => o.model))].sort(modelSort);
+  fModel.innerHTML += models.map(m => `<option>${esc(m)}</option>`).join("");
+  fStore.innerHTML += [...new Set(l.offers.map(o => o.store))].sort().map(s => `<option>${esc(s)}</option>`).join("");
+  fSeries.innerHTML = Object.keys(h.series).sort((a, b) => modelSort(a.split("|")[0], b.split("|")[0]) || a.localeCompare(b))
+    .map(k => `<option value="${esc(k)}">${esc(k.replace("|", " · "))}</option>`).join("");
+  if (l.alerts.length) alerts.innerHTML = `<div class="card alert"><h3 style="margin:0 0 6px">🔔 Alertas de hoje</h3>` +
+    l.alerts.map(a => `<div>• <b>${esc(a.model)}</b> (${a.condition}) ${brl(a.price)} na <a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.store)}</a> — ${a.signals.map(esc).join("; ")}</div>`).join("") + "</div>";
+  status.innerHTML = "<b>Status das lojas:</b> " + l.runs.map(r => `<span>${esc(r.store)}: ${r.status === "ok" ? `<span class="good">ok (${r.n_offers})</span>` : `<span class="bad">${esc(r.status)}</span>`}</span>`).join("");
+  [fCond, fModel, fStore, fNoImport, fOfficial].forEach(e => e.addEventListener("change", renderAll));
+  [fSeries, byStore].forEach(e => e.addEventListener("change", renderChart));
+  document.querySelectorAll("th[data-k]").forEach(th => th.addEventListener("click", () => {
+    sortDir = sortK === th.dataset.k ? -sortDir : 1; sortK = th.dataset.k; renderTable(); }));
+  renderAll(); renderChart();
+}).catch(e => { meta.textContent = "Erro ao carregar dados: " + e; });
+</script>
+</body>
+</html>
