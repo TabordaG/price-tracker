@@ -10,7 +10,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from . import analyze, db, report
-from .collectors import apple, generic, kabum, vtex
+from .collectors import apple, generic, kabum, manual, vtex
 from .collectors.base import Blocked
 from .models import normalize
 
@@ -25,6 +25,7 @@ COLLECTORS = {
     "casasbahia": ("Casas Bahia", lambda t: generic.collect("casasbahia", t)),
     "mercadolivre": ("Mercado Livre", lambda t: generic.collect("mercadolivre", t)),
     "amazon": ("Amazon", lambda t: generic.collect("amazon", t)),
+    "manual": ("Manual", lambda t: manual.collect(t)),
 }
 
 
@@ -65,7 +66,12 @@ def main() -> None:
                 if k not in seen:
                     seen.add(k)
                     offers.append(n)
-            db.save_store(con, today, ts, store, offers, "ok", len(raw))
+            if key == "manual":
+                for o in offers:
+                    o.tags.append("cadastro manual")
+                db.save_manual(con, today, ts, offers)
+            else:
+                db.save_store(con, today, ts, store, offers, "ok", len(raw))
             print(f"[ok] {store}: {len(raw)} anúncios, {len(offers)} válidos")
         except Blocked as e:
             db.save_store(con, today, ts, store, [], "bloqueada", 0, str(e))
@@ -75,10 +81,13 @@ def main() -> None:
             print(f"[erro] {store}: {e}")
             traceback.print_exc()
 
+    db.flag_suspicious(con, today)
     summary = analyze.summarize(con, today, cfg)
+    gmin = cfg["filtro"]["geracao_minima"]
+    imp = cfg["filtro"].get("importados_na_analise", False)
     url = dashboard_url(cfg)
     summary["dashboard_url"] = url
-    report.write_dashboard_data(summary, analyze.daily_min_series(con), analyze.store_series(con), ROOT / "docs")
+    report.write_dashboard_data(summary, analyze.daily_min_series(con, gmin, imp), analyze.store_series(con, gmin, imp), ROOT / "docs")
     subject, body = report.build_email(summary, url)
     (ROOT / "data" / "last_email.html").write_text(body)
     print(subject)

@@ -2,11 +2,14 @@
 # Edite este arquivo direto no GitHub para mudar filtros e alertas.
 
 [filtro]
-geracao_minima = 15          # iPhone 15 em diante (inclui Air, Duo, "e")
+geracao_minima = 16          # iPhone 16 em diante (inclui 16e, Air, Duo)
 armazenamento = "512GB"      # obrigatório
 preco_minimo = 1500          # descarta acessórios/anúncios falsos abaixo disso
 # Condições aceitas: novo, vitrine, recondicionado, usado
 condicoes = ["novo", "vitrine", "recondicionado", "usado"]
+# Importados (versão estrangeira, sem garantia Apple Brasil) aparecem na lista de ofertas,
+# mas ficam fora do "melhor preço", do histórico e dos alertas. Mude para true para incluir.
+importados_na_analise = false
 
 [busca]
 termos = ["iphone 512gb", "iphone 512 gb"]
@@ -39,3 +42,5 @@ magalu = true
 casasbahia = true
 mercadolivre = true
 amazon = true
+# Ofertas cadastradas à mão em ofertas_manuais.toml
+manual = true

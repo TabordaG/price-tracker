@@ -3,158 +3,488 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Monitor iPhone 512GB</title>
+<title>Preço do iPhone 512GB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{--bg:#f7f7f8;--card:#fff;--fg:#1d1d1f;--muted:#6e6e73;--line:#e3e3e6;--accent:#0066cc;--good:#0a7d32;--bad:#b3261e}
-@media (prefers-color-scheme: dark){:root{--bg:#111113;--card:#1c1c1f;--fg:#f2f2f4;--muted:#a0a0a8;--line:#2e2e33;--accent:#4da3ff;--good:#3fcf6e;--bad:#ff6b5e}}
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --ink:#1A2433; --muted:#5E6B7A; --line:#D3D9E0;
+  --tag:#FFD400; --tag-ink:#1A2433; --down:#0F7B45; --up:#C8102E; --focus:#2457C5;
+  --c-novo:#0F7B45; --c-vitrine:#9A5B00; --c-recondicionado:#5B3FC0; --c-usado:#8A3B12;
+  --cond: "Barlow Condensed", "Arial Narrow", sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121A24; --surface:#1B2533; --ink:#E6ECF2; --muted:#9AA8B8; --line:#2C3949;
+    --down:#3CC27E; --up:#FF6B7D; --focus:#7FA6FF;
+    --c-novo:#3CC27E; --c-vitrine:#F0A73A; --c-recondicionado:#A792FF; --c-usado:#F08A5D;
+  }
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-header{padding:20px 16px 8px;max-width:1200px;margin:auto}
-h1{font-size:22px;margin:0 0 4px}
-.sub{color:var(--muted)}
-main{max-width:1200px;margin:auto;padding:0 16px 40px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-.kpi .m{font-weight:600}.kpi .p{font-size:20px;font-weight:700;margin:2px 0}
-.kpi small{color:var(--muted)}
-.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-select,input{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit}
-.tbl{overflow-x:auto}
-table{border-collapse:collapse;width:100%;min-width:760px}
-th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{cursor:pointer;color:var(--muted);font-weight:600;white-space:nowrap;user-select:none}
-td.n{white-space:nowrap;text-align:right}
-a{color:var(--accent);text-decoration:none}
-.tag{display:inline-block;border:1px solid var(--muted);color:var(--muted);border-radius:9px;padding:0 6px;margin:1px;font-size:11px;white-space:nowrap}
-.t-novo{border-color:var(--good);color:var(--good)}.t-vitrine{border-color:#c77d00;color:#c77d00}
-.t-recondicionado{border-color:#7b5cf0;color:#7b5cf0}.t-usado{border-color:#b85a2b;color:#b85a2b}
-.t-importado{border-color:var(--bad);color:var(--bad)}.t-loja{border-color:var(--accent);color:var(--accent)}
-.good{color:var(--good)}.bad{color:var(--bad)}
-.alert{border-left:4px solid #e8a400}
-.chartwrap{position:relative;height:340px}
-.status span{margin-right:12px;white-space:nowrap}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-ui,sans-serif}
+a{color:inherit}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.num{font-family:var(--cond);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.down{color:var(--down)} .up{color:var(--up)} .muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Cabeçalho */
+header{padding:22px 0 0}
+.top{display:flex;flex-wrap:wrap;gap:6px 24px;align-items:baseline;justify-content:space-between}
+h1{font-family:var(--cond);font-weight:700;font-size:34px;line-height:1;margin:0}
+.updated{color:var(--muted);font-size:14px}
+.updated b{color:var(--ink);font-weight:600}
+
+/* Abas */
+nav[role=tablist]{display:flex;gap:4px;margin:18px 0 0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+nav[role=tablist]::-webkit-scrollbar{display:none}
+[role=tab]{background:none;border:0;padding:10px 14px 9px;font-family:var(--cond);font-size:19px;font-weight:600;color:var(--muted);
+  border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+[role=tab][aria-selected=true]{color:var(--ink);border-bottom-color:var(--ink)}
+[role=tab] .count{font-family:Barlow;font-size:13px;font-weight:500;margin-left:4px;color:var(--muted)}
+
+/* Seletor de modelo */
+.models{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 10px;border-bottom:1px solid var(--line)}
+.models-row{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:720px){.models-row{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;cursor:pointer;white-space:nowrap;font-size:15px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .gen{font-family:var(--cond);font-weight:600}
+
+section[role=tabpanel]{padding:22px 0 48px}
+section[hidden]{display:none}
+h2{font-family:var(--cond);font-weight:600;font-size:24px;margin:28px 0 10px;line-height:1.15}
+h2:first-child{margin-top:0}
+.lead{color:var(--muted);margin:-4px 0 14px;max-width:70ch}
+
+/* Etiqueta de gôndola: o elemento marcante */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:20px;align-items:stretch}
+.tag{position:relative;background:var(--tag);color:var(--tag-ink);border-radius:6px 22px 22px 6px;padding:20px 24px 18px 52px;
+  box-shadow:0 1px 0 rgba(26,36,51,.25)}
+.tag::before{content:"";position:absolute;left:18px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;
+  background:var(--bg);box-shadow:inset 0 1px 2px rgba(0,0,0,.35)}
+.tag .model{font-family:var(--cond);font-size:22px;font-weight:600;line-height:1.1}
+.tag .cond{font-size:15px;font-weight:500}
+.tag .price{font-family:var(--cond);font-weight:700;font-size:clamp(46px,9vw,76px);line-height:.95;margin:8px 0 6px;letter-spacing:-.01em}
+.tag .price small{font-size:.36em;font-weight:600;margin-right:4px;vertical-align:.9em}
+.tag .where{font-size:15px}
+.tag .where a{font-weight:600}
+.tag .verdict{margin-top:10px;font-weight:600;font-size:16px}
+.tag-empty .price{font-size:32px}
+.facts{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:9px}
+.fact{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--line);padding-bottom:7px}
+.fact:last-child{border-bottom:0;padding-bottom:0}
+.fact span:first-child{color:var(--muted);font-size:14px}
+.fact .num{font-size:19px;font-weight:600}
+
+/* Alertas */
+.alerts{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.alerts li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--tag);border-radius:6px;padding:10px 14px;
+  display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:center}
+.alerts .what{font-weight:600}
+.alerts .why{color:var(--muted);font-size:14px;grid-column:1}
+.alerts .num{font-size:24px;font-weight:700;grid-row:1/3;grid-column:2;text-align:right}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:16px;color:var(--muted)}
+
+/* Matriz modelo × condição */
+.matrix{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.matrix th,.matrix td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+.matrix tr:last-child th,.matrix tr:last-child td{border-bottom:0}
+.matrix thead th{font-weight:500;color:var(--muted);font-size:14px;background:transparent}
+.matrix tbody th{font-family:var(--cond);font-size:19px;font-weight:600;white-space:nowrap}
+.matrix tbody tr.sel{background:color-mix(in srgb,var(--tag) 22%,transparent)}
+.cell{display:block;width:100%;text-align:left;background:none;border:0;padding:0;cursor:pointer}
+.cell .num{font-size:20px;font-weight:600;display:block;line-height:1.1}
+.cell .d{font-size:13px}
+.cell:hover .num{text-decoration:underline}
+.dash{color:var(--line)}
+.scroll-x{overflow-x:auto}
+
+/* Histórico */
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:0 0 14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-size:15px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.toggle{display:inline-flex;gap:6px;align-items:center;cursor:pointer;font-size:15px}
+.toggle input{width:17px;height:17px;accent-color:var(--ink)}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;height:360px;position:relative}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:14px}
+.stats div{background:var(--surface);padding:10px 14px}
+.stats span:first-child{display:block;color:var(--muted);font-size:13px}
+.stats .num{font-size:22px;font-weight:600}
+
+/* Ofertas */
+.filters{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:16px}
+.filters select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 10px}
+.group{margin:0 0 22px}
+.group h3{font-family:var(--cond);font-weight:600;font-size:22px;margin:0 0 8px;display:flex;gap:10px;align-items:baseline}
+.group h3 .muted{font-family:Barlow;font-size:14px;font-weight:400}
+.offers{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.offer{display:grid;grid-template-columns:118px minmax(0,1fr) auto;gap:4px 16px;padding:12px 14px;border-bottom:1px solid var(--line);align-items:start}
+.offer:last-child{border-bottom:0}
+.offer .p{font-family:var(--cond);font-weight:700;font-size:25px;line-height:1.05}
+.offer .p small{display:block;font-family:Barlow;font-weight:400;font-size:13px;color:var(--muted)}
+.offer .t{font-size:15px;line-height:1.35}
+.offer .t .store{font-weight:600}
+.offer .t .title{color:var(--muted);font-size:14px;display:block;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.offer .go{white-space:nowrap;font-weight:600;font-size:15px;align-self:center}
+.colors{font-size:14px;color:var(--muted);margin-top:4px}
+.colors a{color:var(--ink)}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.pill{font-size:12.5px;line-height:1.4;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.cond{color:var(--surface);border-color:transparent;font-weight:600}
+.pill.c-novo{background:var(--c-novo)} .pill.c-vitrine{background:var(--c-vitrine)}
+.pill.c-recondicionado{background:var(--c-recondicionado)} .pill.c-usado{background:var(--c-usado)}
+.pill.warn{border-color:var(--up);color:var(--up)}
+.pill.ok{border-color:var(--down);color:var(--down)}
+.more{display:block;width:100%;background:none;border:0;border-top:1px solid var(--line);padding:9px;cursor:pointer;color:var(--muted);font-size:14px}
+.more:hover{color:var(--ink)}
+
+/* Lojas */
+.stores{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.stores li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:2px 12px;padding:12px 14px;border-bottom:1px solid var(--line);align-items:center}
+.stores li:last-child{border-bottom:0}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--down)}
+.dot.bad{background:var(--up)} .dot.warn{background:var(--c-vitrine)}
+.stores .name{font-weight:600}
+.stores .why{grid-column:2/4;color:var(--muted);font-size:14px}
+.note{max-width:70ch;color:var(--muted);font-size:15px}
+.note code{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:14px}
+
+footer{color:var(--muted);font-size:13px;padding:0 0 32px}
+
+@media (max-width:720px){
+  h1{font-size:28px}
+  .hero{grid-template-columns:1fr}
+  .tag{padding-left:46px}
+  .tag::before{left:15px}
+  .offer{grid-template-columns:96px minmax(0,1fr)}
+  .offer .go{grid-column:2;justify-self:start}
+  .offer .p{font-size:22px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .tag{animation:hang .5s ease-out both;transform-origin:30px 50%}
+  @keyframes hang{from{transform:rotate(-2.5deg);opacity:0}to{transform:none;opacity:1}}
+}
 </style>
 </head>
 <body>
-<header>
-  <h1>Monitor iPhone 512GB</h1>
-  <div class="sub" id="meta">Carregando…</div>
+<header class="wrap">
+  <div class="top">
+    <h1>Preço do iPhone 512GB</h1>
+    <div class="updated" id="updated">Carregando dados…</div>
+  </div>
+  <nav role="tablist" aria-label="Seções">
+    <button role="tab" id="t-hoje" aria-controls="p-hoje" aria-selected="true">Hoje</button>
+    <button role="tab" id="t-historico" aria-controls="p-historico" aria-selected="false" tabindex="-1">Histórico</button>
+    <button role="tab" id="t-ofertas" aria-controls="p-ofertas" aria-selected="false" tabindex="-1">Ofertas<span class="count" id="n-ofertas"></span></button>
+    <button role="tab" id="t-lojas" aria-controls="p-lojas" aria-selected="false" tabindex="-1">Lojas<span class="count" id="n-lojas"></span></button>
+  </nav>
 </header>
-<main>
-  <div id="alerts"></div>
 
-  <div class="card">
-    <div class="filters">
-      <label>Condição <select id="fCond"><option value="">Todas</option><option>novo</option><option>vitrine</option><option>recondicionado</option><option>usado</option></select></label>
-      <label>Modelo <select id="fModel"><option value="">Todos</option></select></label>
-      <label>Loja <select id="fStore"><option value="">Todas</option></select></label>
-      <label><input type="checkbox" id="fNoImport"> Ocultar importados</label>
-      <label><input type="checkbox" id="fOfficial"> Só loja oficial</label>
+<div class="models">
+  <div class="wrap">
+    <div class="models-row" id="models" role="group" aria-label="Modelo"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section role="tabpanel" id="p-hoje" aria-labelledby="t-hoje">
+    <div class="hero" id="hero"></div>
+    <h2>Alertas de hoje</h2>
+    <ul class="alerts" id="alerts"></ul>
+    <h2>Menor preço por modelo e condição</h2>
+    <p class="lead">Clique num preço para ver as ofertas daquele modelo. A variação compara com a mediana dos últimos 30 dias.</p>
+    <div class="scroll-x"><table class="matrix" id="matrix"></table></div>
+  </section>
+
+  <section role="tabpanel" id="p-historico" aria-labelledby="t-historico" hidden>
+    <div class="controls">
+      <div class="seg" id="h-cond" role="group" aria-label="Condição"></div>
+      <label class="toggle"><input type="checkbox" id="h-stores"> Uma linha por loja</label>
     </div>
-  </div>
+    <div class="chart"><canvas id="chart" aria-label="Gráfico do menor preço diário"></canvas></div>
+    <div class="stats" id="h-stats"></div>
+    <p class="note" id="h-note"></p>
+  </section>
 
-  <div class="card"><h3 style="margin:0 0 8px">Menor preço por modelo (hoje)</h3><div class="grid" id="kpis"></div></div>
+  <section role="tabpanel" id="p-ofertas" aria-labelledby="t-ofertas" hidden>
+    <div class="filters">
+      <div class="seg" id="o-cond" role="group" aria-label="Condição"></div>
+      <label>Ordenar <select id="o-sort">
+        <option value="price">Menor preço</option>
+        <option value="disc">Maior desconto no preço "de"</option>
+        <option value="store">Loja</option>
+      </select></label>
+      <label class="toggle"><input type="checkbox" id="o-official"> Só vendido pela própria loja</label>
+      <label class="toggle"><input type="checkbox" id="o-import" checked> Esconder importados</label>
+    </div>
+    <div id="groups"></div>
+  </section>
 
-  <div class="card">
-    <h3 style="margin:0 0 8px">Histórico do menor preço diário</h3>
-    <div class="filters" style="margin-bottom:8px"><label>Série <select id="fSeries"></select></label>
-    <label><input type="checkbox" id="byStore"> Separar por loja</label></div>
-    <div class="chartwrap"><canvas id="chart"></canvas></div>
-  </div>
-
-  <div class="card">
-    <h3 style="margin:0 0 8px">Todas as ofertas de hoje <small class="sub" id="count"></small></h3>
-    <div class="tbl"><table id="tbl"><thead><tr>
-      <th data-k="model">Modelo</th><th data-k="color">Cor</th><th data-k="price">À vista</th>
-      <th data-k="installment_total">Parcelado</th><th data-k="list_price">Preço "de"</th>
-      <th data-k="store">Loja / vendedor</th><th>Tags</th></tr></thead><tbody></tbody></table></div>
-  </div>
-
-  <div class="card status" id="status"></div>
-  <p class="sub">Preço à vista = menor preço PIX/boleto anunciado; frete e cupons de checkout não incluídos. Dados atualizados diariamente via GitHub Actions.</p>
+  <section role="tabpanel" id="p-lojas" aria-labelledby="t-lojas" hidden>
+    <h2>Lojas consultadas hoje</h2>
+    <ul class="stores" id="stores"></ul>
+    <h2>Oferta de uma loja bloqueada</h2>
+    <div class="note">
+      <p>Amazon, Mercado Livre, Magalu, Casas Bahia e Carrefour recusam acesso automático vindo dos servidores do GitHub. Parte das ofertas da Magalu e da iPlace chega pelos marketplaces da Kabum e da Americanas.</p>
+      <p>Para incluir uma oferta dessas lojas, cadastre o link e o preço no arquivo <code>ofertas_manuais.toml</code> do repositório. Ela entra na comparação e no histórico até a data de validade que você definir, com a etiqueta "cadastro manual".</p>
+    </div>
+  </section>
 </main>
+<footer class="wrap">Preço à vista é o menor valor anunciado para PIX ou boleto. Frete e cupons aplicados no carrinho não estão incluídos. Confira vendedor e garantia antes de comprar.</footer>
+
 <script>
-const brl = v => v == null ? "—" : v.toLocaleString("pt-BR", {style: "currency", currency: "BRL"});
-const pct = v => v == null ? "—" : `<span class="${v < 0 ? "good" : v > 0 ? "bad" : ""}">${v > 0 ? "+" : ""}${v.toFixed(1)}%</span>`;
+const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const tagHtml = t => (t || "").split(",").filter(Boolean).map(x => {
-  const cls = ["novo","vitrine","recondicionado","usado","importado"].includes(x) ? "t-" + x : x === "loja oficial" ? "t-loja" : "";
-  return `<span class="tag ${cls}">${esc(x)}</span>`; }).join("");
-let L, H, chart, sortK = "price", sortDir = 1;
+const brl = v => v == null ? "–" : v.toLocaleString("pt-BR", {style:"currency", currency:"BRL", minimumFractionDigits:2});
+const brl0 = v => v == null ? "–" : "R$ " + Math.round(v).toLocaleString("pt-BR");
+const dateBR = d => d ? d.split("-").reverse().slice(0, 2).join("/") : "–";
+const pctTxt = v => v == null ? "" : `${v > 0 ? "+" : ""}${v.toFixed(1).replace(".", ",")}%`;
+const pctSpan = (v, suffix = "") => v == null ? "" : `<span class="${v < 0 ? "down" : v > 0 ? "up" : "muted"}">${pctTxt(v)}${suffix}</span>`;
+const CONDS = ["novo", "vitrine", "recondicionado", "usado"];
+const COND_LABEL = {novo: "Novo", vitrine: "Vitrine", recondicionado: "Recondicionado", usado: "Usado"};
+const store = {get(k, d){try{return localStorage.getItem(k) ?? d}catch{return d}}, set(k, v){try{localStorage.setItem(k, v)}catch{}}};
 
-function genOf(m){const g = m.match(/\d+/); return g ? +g[0] : (m.includes("Air") ? 17 : 18);}
-function modelSort(a, b){return genOf(b) - genOf(a) || a.localeCompare(b);}
-function filtered(){
-  const c = fCond.value, m = fModel.value, s = fStore.value;
-  return L.offers.filter(o => (!c || o.condition === c) && (!m || o.model === m) && (!s || o.store === s)
-    && !(fNoImport.checked && (o.tags||"").includes("importado")) && !(fOfficial.checked && o.marketplace));
-}
-function renderKpis(){
-  const best = {};
-  for (const o of filtered()) { const k = o.model + "|" + o.condition; if (!best[k] || o.price < best[k].price) best[k] = o; }
-  const items = Object.fromEntries(L.items.map(i => [i.key, i]));
-  kpis.innerHTML = Object.keys(best).sort((a, b) => modelSort(a.split("|")[0], b.split("|")[0]) || a.localeCompare(b)).map(k => {
-    const o = best[k], i = items[k] || {};
-    return `<div class="card kpi" style="margin:0"><div class="m">${esc(o.model)} <span class="tag t-${o.condition}">${o.condition}</span></div>
-      <div class="p">${brl(o.price)}</div>
-      <small>vs mediana 30d ${pct(i.pct_vs_median30)} · vs Apple ${pct(i.pct_vs_apple)}<br>
-      mín. 30d ${brl(i.min30)} · mín. histórico ${brl(i.min_all)}<br>
-      <a href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.store)}</a> · ${esc(o.seller)}</small></div>`;
-  }).join("") || "<p class='sub'>Nenhuma oferta com esses filtros.</p>";
-}
-function renderTable(){
-  const rows = filtered().slice().sort((a, b) => {
-    const x = a[sortK], y = b[sortK];
-    return (x == null) - (y == null) || (typeof x === "number" ? (x - y) : String(x).localeCompare(String(y))) * sortDir;
-  });
-  count.textContent = `(${rows.length})`;
-  document.querySelector("#tbl tbody").innerHTML = rows.map(o => `<tr>
-    <td><b>${esc(o.model)}</b><br><small class="sub">${esc(o.title)}</small></td><td>${esc(o.color)}</td>
-    <td class="n"><b>${brl(o.price)}</b></td>
-    <td class="n">${o.installment_total ? `${o.installments || ""}x<br>${brl(o.installment_total)}` : "—"}</td>
-    <td class="n">${brl(o.list_price)}</td>
-    <td><a href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.store)}</a><br><small class="sub">${esc(o.seller)}</small></td>
-    <td>${tagHtml(o.tags)}${o.promo ? `<br><small class="sub">${esc(o.promo.slice(0, 120))}</small>` : ""}</td></tr>`).join("");
-}
-function renderChart(){
-  const key = fSeries.value; if (!key) return;
-  const css = getComputedStyle(document.documentElement);
-  const palette = ["#0066cc","#e8590c","#2f9e44","#9c36b5","#c2255c","#1098ad","#5c940d","#e67700"];
-  let ds;
-  if (byStore.checked) {
-    const st = H.stores[key] || {};
-    ds = Object.keys(st).map((s, i) => ({label: s, data: st[s].map(([d, p]) => ({x: d, y: p})), borderColor: palette[i % 8], backgroundColor: palette[i % 8], tension: .2}));
-  } else {
-    ds = [{label: key.replace("|", " · "), data: (H.series[key] || []).map(([d, p]) => ({x: d, y: p})), borderColor: palette[0], backgroundColor: palette[0], tension: .2}];
+function gen(m){const g = m.match(/\d+/); return g ? +g[0] : (m.includes("Air") ? 17 : 18);}
+function variant(m){return /Pro Max$/.test(m) ? 0 : /Pro$/.test(m) ? 1 : /Plus$/.test(m) ? 2 : /\de$/.test(m) ? 4 : 3;}
+function modelSort(a, b){return gen(b) - gen(a) || variant(a) - variant(b) || a.localeCompare(b);}
+const tags = o => (o.tags || "").split(",").filter(Boolean);
+const suspicious = o => tags(o).includes("preço suspeito");
+const imported = o => tags(o).includes("importado");
+
+let L, H, chart;
+const S = {tab: "hoje", model: store.get("model", ""), hCond: "novo", oCond: "", open: {}};
+
+/* ---------- Abas ---------- */
+const TABS = ["hoje", "historico", "ofertas", "lojas"];
+function setTab(t, push = true){
+  S.tab = t;
+  for (const x of TABS){
+    const b = $("#t-" + x), sel = x === t;
+    b.setAttribute("aria-selected", sel); b.tabIndex = sel ? 0 : -1;
+    $("#p-" + x).hidden = !sel;
   }
-  const labels = [...new Set(ds.flatMap(d => d.data.map(p => p.x)))].sort();
-  chart && chart.destroy();
-  chart = new Chart(document.getElementById("chart"), {type: "line", data: {labels, datasets: ds},
-    options: {maintainAspectRatio: false, parsing: {xAxisKey: "x", yAxisKey: "y"}, interaction: {mode: "index", intersect: false},
-      plugins: {legend: {labels: {color: css.getPropertyValue("--fg")}}, tooltip: {callbacks: {label: c => `${c.dataset.label}: ${brl(c.parsed.y)}`}}},
-      scales: {x: {ticks: {color: css.getPropertyValue("--muted")}, grid: {color: css.getPropertyValue("--line")}},
-               y: {ticks: {color: css.getPropertyValue("--muted"), callback: v => brl(v)}, grid: {color: css.getPropertyValue("--line")}}}}});
+  if (push) history.replaceState(null, "", "#" + t);
+  if (t === "historico") renderHistory();
 }
-function renderAll(){renderKpis(); renderTable();}
+$("nav[role=tablist]").addEventListener("click", e => { const b = e.target.closest("[role=tab]"); if (b) setTab(b.id.slice(2)); });
+$("nav[role=tablist]").addEventListener("keydown", e => {
+  const i = TABS.indexOf(S.tab), d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+  if (d){ const t = TABS[(i + d + TABS.length) % TABS.length]; setTab(t); $("#t-" + t).focus(); }
+});
 
-Promise.all([fetch("data/latest.json").then(r => r.json()), fetch("data/history.json").then(r => r.json())]).then(([l, h]) => {
-  L = l; H = h;
-  meta.textContent = `Atualizado em ${l.date} · histórico desde ${l.history_start} (${l.n_days} dia(s)) · ${l.offers.length} ofertas hoje`;
-  const models = [...new Set(l.offers.map(o => o.model))].sort(modelSort);
-  fModel.innerHTML += models.map(m => `<option>${esc(m)}</option>`).join("");
-  fStore.innerHTML += [...new Set(l.offers.map(o => o.store))].sort().map(s => `<option>${esc(s)}</option>`).join("");
-  fSeries.innerHTML = Object.keys(h.series).sort((a, b) => modelSort(a.split("|")[0], b.split("|")[0]) || a.localeCompare(b))
-    .map(k => `<option value="${esc(k)}">${esc(k.replace("|", " · "))}</option>`).join("");
-  if (l.alerts.length) alerts.innerHTML = `<div class="card alert"><h3 style="margin:0 0 6px">🔔 Alertas de hoje</h3>` +
-    l.alerts.map(a => `<div>• <b>${esc(a.model)}</b> (${a.condition}) ${brl(a.price)} na <a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.store)}</a> — ${a.signals.map(esc).join("; ")}</div>`).join("") + "</div>";
-  status.innerHTML = "<b>Status das lojas:</b> " + l.runs.map(r => `<span>${esc(r.store)}: ${r.status === "ok" ? `<span class="good">ok (${r.n_offers})</span>` : `<span class="bad">${esc(r.status)}</span>`}</span>`).join("");
-  [fCond, fModel, fStore, fNoImport, fOfficial].forEach(e => e.addEventListener("change", renderAll));
-  [fSeries, byStore].forEach(e => e.addEventListener("change", renderChart));
-  document.querySelectorAll("th[data-k]").forEach(th => th.addEventListener("click", () => {
-    sortDir = sortK === th.dataset.k ? -sortDir : 1; sortK = th.dataset.k; renderTable(); }));
-  renderAll(); renderChart();
-}).catch(e => { meta.textContent = "Erro ao carregar dados: " + e; });
+/* ---------- Seletor de modelo ---------- */
+function models(){ return [...new Set(L.items.map(i => i.model))].sort(modelSort); }
+function renderModels(){
+  const ms = models();
+  if (S.model && !ms.includes(S.model)) S.model = "";
+  $("#models").innerHTML = [`<button class="chip" data-m="" aria-pressed="${!S.model}">Todos</button>`]
+    .concat(ms.map(m => `<button class="chip" data-m="${esc(m)}" aria-pressed="${S.model === m}">${esc(m.replace("iPhone ", "iPhone "))}</button>`)).join("");
+}
+$("#models").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  S.model = b.dataset.m; store.set("model", S.model); renderAll();
+});
+
+function seg(el, options, value, onPick){
+  el.innerHTML = options.map(([v, l]) => `<button data-v="${v}" aria-pressed="${v === value}">${l}</button>`).join("");
+  el.onclick = e => { const b = e.target.closest("button"); if (b) onPick(b.dataset.v); };
+}
+
+/* ---------- Hoje ---------- */
+function bestPick(){
+  const pool = L.items.filter(i => i.condition === "novo" && (!S.model || i.model === S.model));
+  if (!pool.length) return null;
+  if (S.model) return pool[0];  // items já vêm ordenados: o melhor de cada modelo
+  const scored = pool.filter(i => i.pct_vs_median30 != null);
+  if (scored.length) return scored.sort((a, b) => a.pct_vs_median30 - b.pct_vs_median30)[0];
+  const vsApple = pool.filter(i => i.pct_vs_apple != null && !imported(i));
+  return vsApple.length ? vsApple.sort((a, b) => a.pct_vs_apple - b.pct_vs_apple)[0] : pool[0];
+}
+function verdict(i){
+  if (i.signals && i.signals.length) return i.signals[0] + ".";
+  if (i.days < 7) return `Histórico com ${i.days} dia(s). A comparação com a média fica confiável a partir de 7 dias.`;
+  if (i.pct_vs_median30 <= -3) return "Abaixo do normal dos últimos 30 dias.";
+  if (i.pct_vs_median30 >= 3) return "Acima do normal dos últimos 30 dias. Vale esperar.";
+  return "Dentro do preço normal dos últimos 30 dias.";
+}
+function renderHero(){
+  const i = bestPick();
+  if (!i){
+    $("#hero").innerHTML = `<div class="tag tag-empty"><div class="model">${esc(S.model || "Nenhum modelo")}</div>
+      <div class="price">Sem oferta nova hoje</div><div class="where">Veja vitrine, recondicionado e usado na aba Ofertas.</div></div><div></div>`;
+    return;
+  }
+  const title = S.model ? "Melhor preço de aparelho novo" : "Melhor oportunidade em aparelho novo";
+  $("#hero").innerHTML = `
+    <div class="tag" aria-label="${title}">
+      <div class="model">${esc(i.model)} <span class="cond">novo, 512GB</span></div>
+      <div class="price"><small>R$</small>${Math.floor(i.price).toLocaleString("pt-BR")}<small>,${String(Math.round(i.price % 1 * 100)).padStart(2, "0")}</small></div>
+      <div class="where">à vista na <a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.store)}</a>${i.seller && i.seller !== i.store ? `, vendido por ${esc(i.seller)}` : ""}</div>
+      <div class="pills">${pillsHtml(i, true)}</div>
+      <div class="verdict">${esc(verdict(i))}</div>
+    </div>
+    <div class="facts">
+      <div class="fact"><span>Mediana de 30 dias</span><span class="num">${brl0(i.median30)}</span></div>
+      <div class="fact"><span>Menor em 30 dias</span><span class="num">${brl0(i.min30)}</span></div>
+      <div class="fact"><span>Menor já registrado</span><span class="num">${brl0(i.min_all)}</span></div>
+      <div class="fact"><span>Apple Store</span><span class="num">${i.apple_price ? brl0(i.apple_price) + " " + pctSpan(i.pct_vs_apple) : "não vende mais"}</span></div>
+      <div class="fact"><span>Ontem</span><span class="num">${i.yesterday ? brl0(i.yesterday) : "–"}</span></div>
+    </div>`;
+}
+function renderAlerts(){
+  const list = L.alerts.filter(a => !S.model || a.model === S.model);
+  const showAll = S.alertsOpen || list.length <= 5;
+  $("#alerts").innerHTML = list.length ? list.slice(0, showAll ? list.length : 4).map(a => `<li>
+      <span class="what">${esc(a.model)}, ${COND_LABEL[a.condition].toLowerCase()} na <a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.store)}</a></span>
+      <span class="num">${brl(a.price)}</span>
+      <span class="why">${a.signals.map(esc).join(". ")}</span></li>`).join("")
+      + (showAll ? "" : `<li style="display:block;padding:0;border-left-width:1px"><button class="more" style="border-top:0" id="alerts-more">Ver os outros ${list.length - 4} alertas</button></li>`)
+    : `<li class="empty" style="display:block;border-left-width:1px">Nenhum alerta${S.model ? " para " + esc(S.model) : ""} hoje. Os alertas disparam quando o preço cai 8% abaixo da mediana de 30 dias, bate o menor preço registrado ou atinge o preço-alvo do <code>config.toml</code>.</li>`;
+}
+$("#alerts").addEventListener("click", e => { if (e.target.id === "alerts-more"){ S.alertsOpen = true; renderAlerts(); } });
+function renderMatrix(){
+  const by = {}; L.items.forEach(i => by[i.key] = i);
+  const conds = CONDS.filter(c => L.items.some(i => i.condition === c));
+  const rows = models().map(m => `<tr class="${S.model === m ? "sel" : ""}"><th scope="row">${esc(m)}</th>` + conds.map(c => {
+    const i = by[m + "|" + c];
+    return `<td>${i ? `<button class="cell" data-m="${esc(m)}" data-c="${c}"><span class="num">${brl0(i.price)}</span><span class="d">${i.pct_vs_median30 != null ? pctSpan(i.pct_vs_median30) : `<span class="muted">${esc(i.store)}</span>`}</span></button>` : `<span class="dash">–</span>`}</td>`;
+  }).join("") + "</tr>").join("");
+  $("#matrix").innerHTML = `<thead><tr><th scope="col"><span class="sr">Modelo</span></th>${conds.map(c => `<th scope="col">${COND_LABEL[c]}</th>`).join("")}</tr></thead><tbody>${rows}</tbody>`;
+}
+$("#matrix").addEventListener("click", e => {
+  const b = e.target.closest(".cell"); if (!b) return;
+  S.model = b.dataset.m; S.oCond = b.dataset.c; store.set("model", S.model);
+  renderAll(); setTab("ofertas"); window.scrollTo({top: 0});
+});
+
+/* ---------- Histórico ---------- */
+function renderHistory(){
+  const ms = S.model ? [S.model] : models();
+  const conds = CONDS.filter(c => Object.keys(H.series).some(k => k.endsWith("|" + c)));
+  seg($("#h-cond"), conds.map(c => [c, COND_LABEL[c]]), S.hCond, v => { S.hCond = v; renderHistory(); });
+  const css = getComputedStyle(document.documentElement), col = v => css.getPropertyValue(v).trim();
+  const palette = ["#2457C5", "#D9480F", "#0F7B45", "#8E3FC0", "#C8102E", "#0B8A99", "#7A6A00", "#B5179E", "#3D5A80", "#E07A00"];
+  let ds = [];
+  if ($("#h-stores").checked && S.model){
+    const st = H.stores[S.model + "|" + S.hCond] || {};
+    ds = Object.keys(st).sort().map((s, i) => ({label: s, data: st[s].map(([d, p]) => ({x: d, y: p}))}));
+  } else {
+    ds = ms.filter(m => H.series[m + "|" + S.hCond]).map(m => ({label: m, data: H.series[m + "|" + S.hCond].map(([d, p]) => ({x: d, y: p}))}));
+  }
+  ds.forEach((d, i) => Object.assign(d, {borderColor: palette[i % 10], backgroundColor: palette[i % 10], tension: .25, pointRadius: d.data.length < 15 ? 3 : 0, borderWidth: 2}));
+  const labels = [...new Set(ds.flatMap(d => d.data.map(p => p.x)))].sort();
+  if (window.Chart){
+    chart && chart.destroy();
+    chart = new Chart($("#chart"), {type: "line", data: {labels, datasets: ds}, options: {
+      maintainAspectRatio: false, animation: false, parsing: {xAxisKey: "x", yAxisKey: "y"}, interaction: {mode: "nearest", intersect: false},
+      plugins: {legend: {position: "bottom", labels: {color: col("--ink"), boxWidth: 12, font: {family: "Barlow"}}},
+        tooltip: {callbacks: {title: c => dateBR(c[0].label), label: c => `${c.dataset.label}: ${brl(c.parsed.y)}`}}},
+      scales: {x: {ticks: {color: col("--muted"), callback(v){return dateBR(this.getLabelForValue(v));}}, grid: {display: false}},
+               y: {ticks: {color: col("--muted"), callback: v => brl0(v)}, grid: {color: col("--line")}}}}});
+  }
+  const i = S.model && L.items.find(x => x.key === S.model + "|" + S.hCond);
+  $("#h-stats").innerHTML = i ? [["Hoje", i.price], ["Menor em 7 dias", i.min7], ["Menor em 30 dias", i.min30], ["Menor em 90 dias", i.min90], ["Menor já registrado", i.min_all], ["Mediana de 30 dias", i.median30]]
+    .map(([l, v]) => `<div><span>${l}</span><span class="num">${brl0(v)}</span></div>`).join("") : "";
+  $("#h-stats").hidden = !i;
+  $("#h-stores").disabled = !S.model;
+  $("#h-note").textContent = (S.model ? "" : "Escolha um modelo para ver as estatísticas e separar por loja. ")
+    + `O histórico começa em ${dateBR(L.history_start)} e tem ${L.n_days} dia(s) de coleta.`;
+}
+$("#h-stores").addEventListener("change", renderHistory);
+
+/* ---------- Ofertas ---------- */
+function pillsHtml(o, compact = false){
+  const t = tags(o), out = [];
+  if (!compact) out.push(`<span class="pill cond c-${o.condition}">${COND_LABEL[o.condition]}</span>`);
+  for (const x of t){
+    if (CONDS.includes(x) || x === "promoção") continue;
+    if (compact && !["importado", "loja oficial", "marketplace", "lacrado"].includes(x)) continue;
+    const cls = x === "importado" || x === "preço suspeito" ? "warn" : x === "loja oficial" ? "ok" : "";
+    const label = x === "loja oficial" ? "vendido pela loja" : x === "marketplace" ? "vendedor parceiro" : x;
+    out.push(`<span class="pill ${cls}">${esc(label)}</span>`);
+  }
+  return out.join("");
+}
+function filteredOffers(){
+  return L.offers.filter(o => (!S.model || o.model === S.model) && (!S.oCond || o.condition === S.oCond)
+    && !($("#o-official").checked && o.marketplace) && !($("#o-import").checked && imported(o)));
+}
+function renderOffers(){
+  const conds = CONDS.filter(c => L.offers.some(o => o.condition === c));
+  seg($("#o-cond"), [["", "Todas"]].concat(conds.map(c => [c, COND_LABEL[c]])), S.oCond, v => { S.oCond = v; renderOffers(); });
+  const sort = $("#o-sort").value;
+  const disc = o => o.list_price ? 1 - o.price / o.list_price : 0;
+  const cmp = sort === "disc" ? (a, b) => disc(b) - disc(a) : sort === "store" ? (a, b) => a.store.localeCompare(b.store) || a.price - b.price : (a, b) => suspicious(a) - suspicious(b) || a.price - b.price;
+  const list = filteredOffers();
+  $("#n-ofertas").textContent = list.length;
+  // Agrupa anúncios iguais que só mudam de cor (mesma loja, vendedor, condição e preço)
+  const merged = {};
+  for (const o of list){
+    const k = [o.model, o.store, o.seller, o.condition, o.price, imported(o)].join("|");
+    if (!merged[k]) merged[k] = {...o, variants: []};
+    merged[k].variants.push({color: o.color || "cor não informada", url: o.url});
+  }
+  const groups = {};
+  Object.values(merged).forEach(o => (groups[o.model] ||= []).push(o));
+  const keys = Object.keys(groups).sort(modelSort);
+  if (!keys.length){ $("#groups").innerHTML = `<div class="empty">Nenhuma oferta com esses filtros. Tente "Todas" as condições ou desmarque "Só vendido pela própria loja".</div>`; return; }
+  const base = S.model ? 8 : 3;
+  $("#groups").innerHTML = keys.map(m => {
+    const arr = groups[m].sort(cmp), lim = S.open[m] ? arr.length : base;
+    const n = arr.reduce((a, o) => a + o.variants.length, 0);
+    const min = Math.min(...arr.filter(o => !suspicious(o)).map(o => o.price));
+    return `<div class="group"><h3>${esc(m)} <span class="muted">${n} anúncio(s), a partir de ${brl0(min)}</span></h3><ul class="offers">` +
+      arr.slice(0, lim).map(o => {
+        const vs = o.variants, uniq = [...new Map(vs.map(v => [v.color, v])).values()];
+        const colors = uniq.length > 1 ? `<div class="colors">${uniq.length} cores: ${uniq.map(v => `<a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.color)}</a>`).join(", ")}</div>`
+          : uniq[0].color !== "cor não informada" ? `<div class="colors">Cor: ${esc(uniq[0].color)}</div>` : "";
+        return `<li class="offer">
+        <div class="p">${brl(o.price)}<small>${o.installment_total ? `ou ${o.installments}x, total ${brl0(o.installment_total)}` : "à vista"}</small>${o.list_price && o.list_price > o.price * 1.01 ? `<small>de ${brl0(o.list_price)}</small>` : ""}</div>
+        <div class="t"><span class="store">${esc(o.store)}</span>${o.seller && o.seller.toLowerCase() !== o.store.toLowerCase() ? `, vendido por ${esc(o.seller)}` : ""}
+          <span class="title" title="${esc(o.title)}">${esc(o.title)}</span>${colors}<div class="pills">${pillsHtml(o)}</div></div>
+        <a class="go" href="${esc(o.url)}" target="_blank" rel="noopener">Abrir na loja</a></li>`; }).join("") +
+      (arr.length > base ? `<li><button class="more" data-m="${esc(m)}">${S.open[m] ? "Mostrar menos" : `Mostrar mais ${arr.length - base}`}</button></li>` : "") + `</ul></div>`;
+  }).join("");
+}
+$("#groups").addEventListener("click", e => { const b = e.target.closest(".more"); if (b){ S.open[b.dataset.m] = !S.open[b.dataset.m]; renderOffers(); } });
+["#o-sort", "#o-official", "#o-import"].forEach(s => $(s).addEventListener("change", renderOffers));
+
+/* ---------- Lojas ---------- */
+function renderStores(){
+  const order = r => r.status === "ok" ? 0 : 1;
+  const runs = L.runs.filter(r => r.store !== "Manual" || r.n_offers).sort((a, b) => order(a) - order(b) || a.store.localeCompare(b.store));
+  const ok = runs.filter(r => r.status === "ok" && r.store !== "Manual").length, total = runs.filter(r => r.store !== "Manual").length;
+  $("#n-lojas").textContent = `${ok}/${total}`;
+  $("#stores").innerHTML = runs.map(r => {
+    const good = r.status === "ok";
+    const why = r.store === "Manual" ? `${r.n_offers} oferta(s) cadastrada(s) à mão e dentro da validade.`
+      : good ? `${r.n_offers} oferta(s) de 512GB válidas entre ${r.n_raw} anúncios lidos.`
+      : `${r.status === "bloqueada" ? "Recusou o acesso automático" : "Erro na leitura"} hoje.${r.last_ok ? ` Última coleta com sucesso em ${dateBR(r.last_ok)}.` : " Ainda sem nenhuma coleta com sucesso."}`;
+    return `<li><span class="dot ${good ? "" : r.last_ok ? "warn" : "bad"}"></span><span class="name">${esc(r.store)}</span>
+      <span class="${good ? "down" : "up"}">${good ? "ok" : esc(r.status)}</span><span class="why">${why}</span></li>`;
+  }).join("");
+}
+
+function renderAll(){ renderModels(); renderHero(); renderAlerts(); renderMatrix(); renderOffers(); if (S.tab === "historico") renderHistory(); }
+
+Promise.all([fetch("data/latest.json", {cache: "no-cache"}).then(r => r.json()), fetch("data/history.json", {cache: "no-cache"}).then(r => r.json())])
+  .then(([l, h]) => {
+    L = l; H = h;
+    const ts = (l.runs.find(r => r.ts) || {}).ts;
+    const hora = ts ? new Date(ts).toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo"}) : "";
+    $("#updated").innerHTML = `Atualizado em <b>${dateBR(l.date)}</b>${hora ? ` às ${hora}` : ""}, com ${l.offers.length} ofertas`;
+    renderStores(); renderAll();
+    const t = location.hash.slice(1); setTab(TABS.includes(t) ? t : "hoje", false);
+  })
+  .catch(e => { $("#updated").textContent = "Não foi possível carregar os dados (" + e.message + "). Recarregue a página."; });
 </script>
 </body>
 </html>

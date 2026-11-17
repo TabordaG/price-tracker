@@ -19,6 +19,7 @@ def mk(title, price=8000.0, seller="Loja", marketplace=False, list_price=None):
     ("Apple iPhone 16e 512GB Branco", "iPhone 16e"),
     ("Smartphone Apple iPhone 17e 512GB 8GB RAM Preto", "iPhone 17e"),
     ("iPhone 15 Plus 512 GB Rosa", "iPhone 15 Plus"),
+    ("Apple iPhone 16 Plus 512GB Ultramarino", "iPhone 16 Plus"),
     ("Smartphone Apple iPhone Air 512GB 8GB RAM Azul-céu", "iPhone Air"),
     ("iPhone Duo Apple 512GB Night Sky Desbloqueado", "iPhone Duo"),
     ("Apple Iphone 17 Pro 512gb Azul-intenso", "iPhone 17 Pro"),
@@ -35,6 +36,7 @@ def test_storage_ignores_ram():
 
 def test_filters():
     assert normalize(mk("iPhone 14 Pro 512GB"), CFG) is None            # geração antiga
+    assert normalize(mk("iPhone 15 Pro Max 512GB"), CFG) is None        # mínimo agora é 16
     assert normalize(mk("iPhone 12 Pro 512GB Grafite"), CFG) is None
     assert normalize(mk("iPhone 17 256GB Preto"), CFG) is None           # armazenamento
     assert normalize(mk("Capa para iPhone 17 Pro 512GB", 99), CFG) is None
@@ -43,7 +45,7 @@ def test_filters():
 
 
 @pytest.mark.parametrize("t,seller,cond", [
-    ("Usado: iPhone 15 Pro Max 512GB Titânio Azul Muito Bom - Trocafone", "Trocafone", "usado"),
+    ("Usado: iPhone 16 Pro Max 512GB Titânio Azul Muito Bom - Trocafone", "Trocafone", "usado"),
     ("iPhone 16 Pro 512GB Seminovo", "X", "usado"),
     ("iPhone 16 Pro 512GB Vitrine", "X", "vitrine"),
     ("iPhone 16 Pro 512GB Open Box", "X", "vitrine"),
@@ -60,7 +62,7 @@ def test_tags():
     o = normalize(mk("iPhone 18 Pro Max 512GB Apple Black Desbloqueado", seller="infotec importados USA",
                      marketplace=True, list_price=10000, price=9000), CFG)
     assert "importado" in o.tags and "marketplace" in o.tags and "-10% vs preço 'de'" in o.tags
-    o = normalize(mk("Usado: iPhone 15 512GB Preto Excelente - Trocafone"), CFG)
+    o = normalize(mk("Usado: iPhone 16 512GB Preto Excelente - Trocafone"), CFG)
     assert "estado: excelente" in o.tags
     o = normalize(mk("IPHONE 18 PRO MAX BORDO 512GB MJXV4BE/A"), CFG)
     assert "importado" not in o.tags and o.color == "Bordô"

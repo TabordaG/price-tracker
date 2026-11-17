@@ -16,9 +16,10 @@ def _model_sort(m: str) -> tuple:
     return (-gen, var, m)
 
 
-def daily_min_series(con: sqlite3.Connection) -> dict[str, list[tuple[str, float]]]:
+def daily_min_series(con: sqlite3.Connection, gmin: int = 0, incl_imp: bool = False) -> dict[str, list[tuple[str, float]]]:
     rows = con.execute(
-        "SELECT model, condition, date, MIN(price) p FROM offers GROUP BY model, condition, date ORDER BY date"
+        "SELECT model, condition, date, MIN(price) p FROM offers WHERE generation>=? AND NOT tags LIKE '%suspeito%' AND (? OR NOT tags LIKE '%importado%') "
+        "GROUP BY model, condition, date ORDER BY date", (gmin, int(incl_imp))
     ).fetchall()
     out: dict[str, list] = {}
     for r in rows:
@@ -26,9 +27,10 @@ def daily_min_series(con: sqlite3.Connection) -> dict[str, list[tuple[str, float
     return out
 
 
-def store_series(con: sqlite3.Connection) -> dict[str, dict[str, list]]:
+def store_series(con: sqlite3.Connection, gmin: int = 0, incl_imp: bool = False) -> dict[str, dict[str, list]]:
     rows = con.execute(
-        "SELECT model, condition, store, date, MIN(price) p FROM offers GROUP BY model, condition, store, date ORDER BY date"
+        "SELECT model, condition, store, date, MIN(price) p FROM offers WHERE generation>=? AND NOT tags LIKE '%suspeito%' AND (? OR NOT tags LIKE '%importado%') "
+        "GROUP BY model, condition, store, date ORDER BY date", (gmin, int(incl_imp))
     ).fetchall()
     out: dict[str, dict[str, list]] = {}
     for r in rows:
@@ -37,17 +39,21 @@ def store_series(con: sqlite3.Connection) -> dict[str, dict[str, list]]:
 
 
 def summarize(con: sqlite3.Connection, today: str, cfg: dict) -> dict:
-    series = daily_min_series(con)
+    gmin = cfg["filtro"]["geracao_minima"]
+    incl_imp = cfg["filtro"].get("importados_na_analise", False)
+    series = daily_min_series(con, gmin, incl_imp)
     t = Date.fromisoformat(today)
     d7, d30, d90 = (str(t - timedelta(days=n)) for n in (7, 30, 90))
     a = cfg["alertas"]
     targets = a.get("preco_alvo", {}) or {}
 
     offers_today = [dict(r) for r in con.execute(
-        "SELECT * FROM offers WHERE date=? ORDER BY price", (today,)).fetchall()]
+        "SELECT * FROM offers WHERE date=? AND generation>=? ORDER BY price", (today, gmin)).fetchall()]
     best: dict[str, dict] = {}
     for o in offers_today:
-        best.setdefault(f"{o['model']}|{o['condition']}", o)
+        excl = "suspeito" in (o["tags"] or "") or (not incl_imp and "importado" in (o["tags"] or ""))
+        if not excl:
+            best.setdefault(f"{o['model']}|{o['condition']}", o)
 
     apple_ref = {o["model"]: o["price"] for o in offers_today if o["store"] == "Apple Store"}
     # Apple não muda preço com frequência: usa último preço conhecido se hoje falhou
@@ -99,6 +105,9 @@ def summarize(con: sqlite3.Connection, today: str, cfg: dict) -> dict:
     items.sort(key=lambda x: (_model_sort(x["model"]), COND_ORDER.get(x["condition"], 9)))
     alerts.sort(key=lambda x: (x["pct_vs_median30"] or 0))
     runs = [dict(r) for r in con.execute("SELECT * FROM runs WHERE date=? ORDER BY store", (today,))]
-    first = con.execute("SELECT MIN(date) FROM offers").fetchone()[0]
+    last_ok = dict(con.execute("SELECT store, MAX(date) FROM runs WHERE status='ok' GROUP BY store").fetchall())
+    for r in runs:
+        r["last_ok"] = last_ok.get(r["store"])
+    first = con.execute("SELECT MIN(date) FROM offers WHERE generation>=?", (gmin,)).fetchone()[0]
     return {"date": today, "items": items, "alerts": alerts, "offers": offers_today, "runs": runs,
             "history_start": first, "n_days": con.execute("SELECT COUNT(DISTINCT date) FROM offers").fetchone()[0]}

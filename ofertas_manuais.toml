@@ -1,0 +1,15 @@
+# Ofertas cadastradas à mão: lojas que bloqueiam coleta automática (Amazon, Mercado Livre, Magalu...).
+# Edite direto no GitHub (ícone de lápis). Elas entram no relatório até a data "valida_ate".
+#
+# Campos: url, titulo (precisa ter modelo e "512GB"), preco (à vista/PIX), valida_ate (AAAA-MM-DD).
+# Opcionais: preco_de, parcelas, total_parcelado, vendedor, marketplace (true/false),
+#            condicao ("novo" | "vitrine" | "recondicionado" | "usado"), obs.
+#
+# Exemplo (remova o "#" das linhas para ativar):
+# [[oferta]]
+# url = "https://www.amazon.com.br/dp/B0GQWVWM4H"
+# titulo = "Apple iPhone 17 Pro 512GB Azul-intenso"
+# preco = 8999.00
+# valida_ate = 2026-11-30
+# vendedor = "Amazon"
+# obs = "Cupom no app"

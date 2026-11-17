@@ -46,3 +46,36 @@ def save_store(con: sqlite3.Connection, date: str, ts: str, store: str, offers: 
             con.executemany(f"INSERT INTO offers ({','.join(COLS)}) VALUES ({','.join('?' * len(COLS))})", rows)
         con.execute("DELETE FROM runs WHERE date=? AND store=?", (date, store))
         con.execute("INSERT INTO runs VALUES (?,?,?,?,?,?,?)", (date, ts, store, status, n_raw, len(offers), error[:500]))
+
+
+def save_manual(con: sqlite3.Connection, date: str, ts: str, offers: list[Offer]) -> None:
+    """Ofertas manuais: gravadas com a loja real, marcadas pela tag 'cadastro manual'."""
+    with con:
+        con.execute("DELETE FROM offers WHERE date=? AND tags LIKE '%cadastro manual%'", (date,))
+        for o in offers:
+            d = o.to_dict()
+            d.update(date=date, ts=ts, marketplace=int(o.marketplace))
+            con.execute(f"INSERT INTO offers ({','.join(COLS)}) VALUES ({','.join('?' * len(COLS))})",
+                        [d.get(c) for c in COLS])
+        con.execute("DELETE FROM runs WHERE date=? AND store='Manual'", (date,))
+        con.execute("INSERT INTO runs VALUES (?,?,?,?,?,?,?)", (date, ts, "Manual", "ok", len(offers), len(offers), ""))
+
+
+def flag_suspicious(con: sqlite3.Connection, date: str, ratio: float = 0.6) -> int:
+    """Marca 'preço suspeito' quando o preço é menor que 60% da mediana do mesmo modelo/condição no dia.
+
+    Pega anúncio com preço errado, de sinal/reserva ou golpe. Fica fora dos alertas e do histórico.
+    """
+    from statistics import median
+    rows = con.execute("SELECT rowid, model, condition, price, tags FROM offers WHERE date=?", (date,)).fetchall()
+    groups: dict[tuple, list[float]] = {}
+    for r in rows:
+        groups.setdefault((r["model"], r["condition"]), []).append(r["price"])
+    n = 0
+    with con:
+        for r in rows:
+            prices = groups[(r["model"], r["condition"])]
+            if len(prices) >= 3 and r["price"] < median(prices) * ratio and "suspeito" not in (r["tags"] or ""):
+                con.execute("UPDATE offers SET tags=? WHERE rowid=?", ((r["tags"] or "") + ",preço suspeito", r["rowid"]))
+                n += 1
+    return n
